@@ -25,6 +25,9 @@ dd {
 body {
   height: 100vh;
   width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 a:not([class]) {
@@ -34,4 +37,8 @@ a:not([class]) {
 img {
   max-width: 100%;
   display: block;
+}
+
+canvas {
+  background-color: grey;
 }
