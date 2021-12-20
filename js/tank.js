@@ -1,4 +1,4 @@
-import {DIRECTION, MAP_END, MAP_START, PLAYER_TANK_SPRITES, STAGE_SIZE, UNIT_SIZE} from "./data.js";
+import {BASE_BLOCK_SIZE, MAP_END, MAP_START, UNIT_SIZE} from "./data.js";
 
 export default class Tank {
     constructor(x,y,direction) {
@@ -8,10 +8,22 @@ export default class Tank {
         };
         this.x = x;
         this.y = y;
+        this.moved = false;
+        this.type = "playerTank";
     }
 
-    update(activeKeys, previousTank) {
+    haveCollision (a, aSize, b, bSize) {
+        return (a.x + aSize > b.x &&
+            b.x + bSize > a.x &&
+            a.y + aSize > b.y &&
+            b.y + bSize > a.y)
+    }
+
+    update(activeKeys, map) {
+        console.log(map);
         let previousDirection = this.direction.direction;
+        let previousX = this.x;
+        let previousY = this.y;
         if (activeKeys.has('ArrowUp')) {
             if (this.y !== MAP_START.y) {
             this.y -= 1;
@@ -33,8 +45,21 @@ export default class Tank {
             }
             this.direction.direction = "LEFT";
         }
+
+        let collision = new Set();
+        map.forEach((object) => {
+            collision.add(this.haveCollision(object, BASE_BLOCK_SIZE, this, UNIT_SIZE));
+        });
+
+        if (collision.has(true)) {
+            this.x = previousX;
+            this.y = previousY;
+        }
+
         previousDirection === this.direction.direction ?
             this.direction.times += 1
             : this.direction.times = 1;
+
+        this.moved = previousX === this.x && previousY === this.y;
     }
 }

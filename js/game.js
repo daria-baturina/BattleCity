@@ -46,7 +46,7 @@ export default class Game {
         this.previousWorld = JSON.parse(JSON.stringify(this.world));
         this.world.update(this.activeKeys, this.previousWorld);
         //обновить view (отрисовка)
-        this.view.update(this.world);
+        this.view.update(this.world, this.previousWorld);
         requestAnimationFrame(this.gameLoop);
     }
 };

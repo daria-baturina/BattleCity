@@ -4,7 +4,7 @@ import {BASE_BLOCK_SIZE, BLOCKS, DIRECTION, PLAYER_TANK_SPRITES, STAGE_SIZE, UNI
 export default class View {
     constructor(canvas, sprite) {
         this.canvas = canvas;
-        this.contex = canvas.getContext('2d');
+        this.context = canvas.getContext('2d');
         this.sprite = sprite;
     }
 
@@ -12,36 +12,38 @@ export default class View {
         await this.sprite.load();
     }
 
-    update (world, previousWorld) {
-        /*отрисовка уровня*/
+    update (world) {
         this.clearStage();
-        this.renderMap(world.map);
+        this.renderMap(world.map.map);
         this.renderPlayerTank(world.playerTank);
     }
 
     clearStage() {
-        this.contex.clearRect(MAP_START.x, MAP_START.y, STAGE_SIZE, STAGE_SIZE);
+        this.context.clearRect(MAP_START.x, MAP_START.y, STAGE_SIZE, STAGE_SIZE);
     }
 
     renderMap(map) {
-        map.forEach((row, rowIndex) => {
-            row.forEach((block, blockIndex) => {
-                this.contex.drawImage(this.sprite.img,
-                    ...BLOCKS[block],
-                    MAP_START.x + blockIndex * BASE_BLOCK_SIZE, MAP_START.y + rowIndex * BASE_BLOCK_SIZE, BASE_BLOCK_SIZE, BASE_BLOCK_SIZE
-                )})
-            })
-        }
+        this.context.fillStyle = '#636363';
+        this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+        this.context.fillStyle = '#000000';
+        this.context.fillRect(MAP_START.x, MAP_START.y, STAGE_SIZE, STAGE_SIZE);
+        map.forEach((object) => {
+            this.context.drawImage(this.sprite.img,
+                ...BLOCKS[object.type],
+                object.x, object.y, BASE_BLOCK_SIZE, BASE_BLOCK_SIZE
+            )
+        })
+    }
 
     renderPlayerTank(playerTank) {
-        console.log(playerTank);
-        if (playerTank.direction.times % 2 === 0) {
-            this.contex.drawImage(this.sprite.img,
+        if (playerTank.direction.times % 2 === 0 && !playerTank.moved) {
+            this.context.drawImage(this.sprite.img,
                 ...PLAYER_TANK_SPRITES[DIRECTION[playerTank.direction.direction] * 2 + 1],
                 playerTank.x, playerTank.y, UNIT_SIZE, UNIT_SIZE
             );
         } else {
-            this.contex.drawImage(this.sprite.img,
+            this.context.drawImage(this.sprite.img,
                 ...PLAYER_TANK_SPRITES[DIRECTION[playerTank.direction.direction] * 2],
                 playerTank.x, playerTank.y, UNIT_SIZE, UNIT_SIZE
             )
