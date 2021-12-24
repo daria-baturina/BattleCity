@@ -7,7 +7,8 @@ export default class World {
     playerTank = new Tank(4 * UNIT_SIZE + MAP_START.x, 12 * UNIT_SIZE + MAP_START.y,"UP");
     enemyTanks = [];
 
-    update(activeKeys, previousWorld) {
-        this.playerTank.update(activeKeys, this.map.map, previousWorld.playerTank);
+    update(activeKeys, timeDelta) {
+        let gameSpeed = timeDelta/16;
+        this.playerTank.update(activeKeys, this.map, gameSpeed);
     }
 };

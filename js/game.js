@@ -1,10 +1,9 @@
 export default class Game {
-    constructor({ world, view, levels}) {
+    constructor({ world, view }) {
         this.world = world;
         this.view = view;
-        this.levels = levels;
         this.activeKeys = new Set;
-        this.previousWorld = {};
+        this.lastTime = 0;
 
         this.gameLoop = this.gameLoop.bind(this);
     }
@@ -40,13 +39,17 @@ export default class Game {
         requestAnimationFrame(this.gameLoop);
     }
 
-    gameLoop() {
+    gameLoop(currentTime) {
+        const timeDelta = currentTime - this.lastTime;
         //получить input
         //обновить world
-        this.previousWorld = JSON.parse(JSON.stringify(this.world));
-        this.world.update(this.activeKeys, this.previousWorld);
+/*        this.previousWorld = JSON.parse(JSON.stringify(this.world));*/
+        this.world.update(this.activeKeys, timeDelta);
         //обновить view (отрисовка)
-        this.view.update(this.world, this.previousWorld);
+        this.view.update(this.world);
+
+        this.lastTime = currentTime;
+
         requestAnimationFrame(this.gameLoop);
     }
 };
