@@ -1,4 +1,4 @@
-import {BASE_BLOCK_SIZE, BULLET_SIZE, BULLET_SPRITES, UNIT_SIZE} from "./data.js";
+import {BASE_BLOCK_SIZE, BULLET_SIZE, BULLET_SPRITES} from "./data.js";
 import Explosion from "./explosion.js";
 
 export default class Bullet {

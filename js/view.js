@@ -24,6 +24,7 @@ export default class View {
         this.clearStage();
         this.renderMap(world.map.map);
         this.renderPlayerTank(world.playerTank);
+        this.renderEnemyTanks(world.enemyTanks);
     }
 
     clearStage() {
@@ -68,5 +69,21 @@ export default class View {
                 playerTank.bullet.x, playerTank.bullet.y, BULLET_SIZE, BULLET_SIZE
             )}
         }
+    }
+
+    renderEnemyTanks(enemyTanks) {
+        enemyTanks.forEach(enemyTank => {
+            if (enemyTank.direction.times % 2 === 0 && !enemyTank.moved) {
+                this.context.drawImage(this.sprite.img,
+                    ...enemyTank.sprites[DIRECTION[enemyTank.direction.direction] * 2 + 1],
+                    enemyTank.x, enemyTank.y, UNIT_SIZE, UNIT_SIZE
+                );
+            } else {
+                this.context.drawImage(this.sprite.img,
+                    ...enemyTank.sprites[DIRECTION[enemyTank.direction.direction] * 2],
+                    enemyTank.x, enemyTank.y, UNIT_SIZE, UNIT_SIZE
+                )
+            }
+        })
     }
 };
