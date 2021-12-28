@@ -8,9 +8,8 @@ const canvas = document.querySelector('canvas');
 const sprite = new Sprite('./assets/sprite.png');
 
 const game = new Game({
-    world: new World(),
+    world: new World(LEVEL1),
     view: new View(canvas, sprite),
-    LEVEL1
 });
 
 game.init().then(() => game.start());

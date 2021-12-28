@@ -7,7 +7,6 @@ export default class Map {
     }
 
     update(...collisions) {
-        console.log(collisions);
         collisions.splice(collisions.indexOf(false), 1);
         collisions.forEach(collision => {
             collision.forEach(objectOfCollision => {

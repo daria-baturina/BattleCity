@@ -16,73 +16,101 @@ export default class View {
         this.sprite = sprite;
     }
 
-    async init () {
+    async init() {
         await this.sprite.load();
     }
 
-    update (world) {
+    update(world) {
         this.clearStage();
-        this.renderMap(world.map.map);
-        this.renderPlayerTank(world.playerTank);
-        this.renderEnemyTanks(world.enemyTanks);
+        this.context.fillStyle = '#636363';
+        this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+        this.context.fillStyle = '#000000';
+        this.context.fillRect(MAP_START.x, MAP_START.y, STAGE_SIZE, STAGE_SIZE);
+        this.renderObjects(world.objects);
     }
 
     clearStage() {
         this.context.clearRect(MAP_START.x, MAP_START.y, STAGE_SIZE, STAGE_SIZE);
     }
 
-    renderMap(map) {
-        this.context.fillStyle = '#636363';
-        this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
-
-        this.context.fillStyle = '#000000';
-        this.context.fillRect(MAP_START.x, MAP_START.y, STAGE_SIZE, STAGE_SIZE);
-        map.forEach((object) => {
-            if (object.type > 0) {
-            this.context.drawImage(this.sprite.img,
-                ...BLOCKS[object.type],
-                object.x, object.y, BASE_BLOCK_SIZE, BASE_BLOCK_SIZE
-            )}
-        })
-    }
-
-    renderPlayerTank(playerTank) {
-        if (playerTank.direction.times % 2 === 0 && !playerTank.moved) {
-            this.context.drawImage(this.sprite.img,
-                ...playerTank.sprites[DIRECTION[playerTank.direction.direction] * 2 + 1],
-                playerTank.x, playerTank.y, UNIT_SIZE, UNIT_SIZE
-            );
-        } else {
-            this.context.drawImage(this.sprite.img,
-                ...playerTank.sprites[DIRECTION[playerTank.direction.direction] * 2],
-                playerTank.x, playerTank.y, UNIT_SIZE, UNIT_SIZE
-            )
-        }
-        if (playerTank.bullet) {
-            if (playerTank.bullet.explosion) {
-                this.context.drawImage(this.sprite.img,
-                    ...playerTank.bullet.explosion.sprites[(Math.floor(playerTank.bullet.explosion.timer/2))],
-                    playerTank.bullet.explosion.x, playerTank.bullet.explosion.y, BULLET_EXPLOSION_SIZE, BULLET_EXPLOSION_SIZE
-                )} else {
-                this.context.drawImage(this.sprite.img,
-                ...playerTank.bullet.sprites[DIRECTION[playerTank.bullet.direction]],
-                playerTank.bullet.x, playerTank.bullet.y, BULLET_SIZE, BULLET_SIZE
-            )}
-        }
-    }
-
-    renderEnemyTanks(enemyTanks) {
-        enemyTanks.forEach(enemyTank => {
-            if (enemyTank.direction.times % 2 === 0 && !enemyTank.moved) {
-                this.context.drawImage(this.sprite.img,
-                    ...enemyTank.sprites[DIRECTION[enemyTank.direction.direction] * 2 + 1],
-                    enemyTank.x, enemyTank.y, UNIT_SIZE, UNIT_SIZE
-                );
-            } else {
-                this.context.drawImage(this.sprite.img,
-                    ...enemyTank.sprites[DIRECTION[enemyTank.direction.direction] * 2],
-                    enemyTank.x, enemyTank.y, UNIT_SIZE, UNIT_SIZE
-                )
+    renderObjects(objects) {
+        objects.forEach(obj => {
+            switch (obj.type) {
+                case 1:
+                case 2:
+                    this.context.drawImage(this.sprite.img,
+                        ...BLOCKS[obj.type],
+                        obj.x, obj.y, BASE_BLOCK_SIZE, BASE_BLOCK_SIZE
+                    );
+                    break;
+                case "playerTank":
+                    if (obj.direction.times % 2 === 0 && obj.moved) {
+                        this.context.drawImage(this.sprite.img,
+                            ...obj.sprites[DIRECTION[obj.direction.direction] * 2 + 1],
+                            obj.x, obj.y, UNIT_SIZE, UNIT_SIZE
+                        );
+                    } else {
+                        this.context.drawImage(this.sprite.img,
+                            ...obj.sprites[DIRECTION[obj.direction.direction] * 2],
+                            obj.x, obj.y, UNIT_SIZE, UNIT_SIZE
+                        )
+                    }
+                    if (obj.bullet) {
+                        if (obj.bullet.explosion) {
+                            this.context.drawImage(this.sprite.img,
+                                ...obj.bullet.explosion.sprites[(Math.floor(obj.bullet.explosion.timer / 2))],
+                                obj.bullet.explosion.x, obj.bullet.explosion.y, BULLET_EXPLOSION_SIZE, BULLET_EXPLOSION_SIZE
+                            )
+                        } else {
+                            this.context.drawImage(this.sprite.img,
+                                ...obj.bullet.sprites[DIRECTION[obj.bullet.direction]],
+                                obj.bullet.x, obj.bullet.y, BULLET_SIZE, BULLET_SIZE
+                            )
+                        }
+                    }
+                    break;
+                case "enemyTank":
+                    if (obj.direction.times % 2 === 0 && obj.moved) {
+                        this.context.drawImage(this.sprite.img,
+                            ...obj.sprites[DIRECTION[obj.direction.direction] * 2 + 1],
+                            obj.x, obj.y, UNIT_SIZE, UNIT_SIZE
+                        );
+                    } else {
+                        this.context.drawImage(this.sprite.img,
+                            ...obj.sprites[DIRECTION[obj.direction.direction] * 2],
+                            obj.x, obj.y, UNIT_SIZE, UNIT_SIZE
+                        )
+                    }
+                    if (obj.bullet) {
+                        if (obj.bullet.explosion) {
+                            this.context.drawImage(this.sprite.img,
+                                ...obj.bullet.explosion.sprites[(Math.floor(obj.bullet.explosion.timer / 2))],
+                                obj.bullet.explosion.x, obj.bullet.explosion.y, BULLET_EXPLOSION_SIZE, BULLET_EXPLOSION_SIZE
+                            )
+                        } else {
+                            this.context.drawImage(this.sprite.img,
+                                ...obj.bullet.sprites[DIRECTION[obj.bullet.direction]],
+                                obj.bullet.x, obj.bullet.y, BULLET_SIZE, BULLET_SIZE
+                            )
+                        }
+                    }
+                    break;
+                case "base":
+                    this.context.drawImage(this.sprite.img,
+                        ...obj.sprites[0],
+                        obj.x, obj.y, UNIT_SIZE, UNIT_SIZE
+                    );
+                    break;
+                case "gameOver" :
+                    this.context.fillStyle = '#636363';
+                    this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
+                    console.log(obj);
+                    this.context.drawImage(this.sprite.img,
+                        ...obj.sprite[0],
+                        obj.x, obj.y, 4 * UNIT_SIZE, 2 * UNIT_SIZE
+                    );
+                    break;
             }
         })
     }

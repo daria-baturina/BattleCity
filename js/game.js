@@ -12,6 +12,7 @@ export default class Game {
         await this.view.init(this.world);
         /*отрисовка карты*/
         document.addEventListener('keydown', ev => {
+            ev.preventDefault();
             switch (ev.code) {
                 case 'ArrowUp':
                 case 'ArrowRight':

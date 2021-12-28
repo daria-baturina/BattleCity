@@ -1,4 +1,4 @@
-import {BASE_BLOCK_SIZE, BULLET_SIZE, BULLET_SPRITES} from "./data.js";
+import {BASE_BLOCK_SIZE, BULLET_SIZE, BULLET_SPRITES, UNIT_SIZE} from "./data.js";
 import Explosion from "./explosion.js";
 
 export default class Bullet {
@@ -15,14 +15,28 @@ export default class Bullet {
         this.speed = 3;
     }
 
-    haveCollision (a, aSize, b, bSize) {
+    haveCollision (a, b) {
+        let getSize = obj => {
+            switch (obj.type) {
+                case -1:
+                case 1:
+                case 2:
+                    return BASE_BLOCK_SIZE;
+                case "playerTank":
+                case "enemyTank":
+                case "base":
+                    return UNIT_SIZE;
+                case "bullet":
+                    return BULLET_SIZE;
+            }
+        }
         let result =
-            a.x + aSize > b.x &&
-            b.x + bSize > a.x &&
-            a.y + aSize > b.y &&
-            b.y + bSize > a.y
+            a.x + getSize(a) > b.x &&
+            b.x + getSize(b) > a.x &&
+            a.y + getSize(a) > b.y &&
+            b.y + getSize(b) > a.y
         if (result) {
-            return [a, b]
+            return a
         } else {
             return false
         }
@@ -37,7 +51,7 @@ export default class Bullet {
         }
     }
 
-    update(map, gameSpeed) {
+    update(world, gameSpeed) {
         let shift = gameSpeed * this.speed;
         if (!this.explosion) {
             switch (this.direction) {
@@ -57,13 +71,15 @@ export default class Bullet {
 
             /*есть ли коллизии после передвижения*/
             let collisions = new Set();
-            map.map.forEach((object) => {
-                collisions.add(this.haveCollision(object, BASE_BLOCK_SIZE, this, BULLET_SIZE));
+            world.objects.forEach((object) => {
+                if (object !== this.tank) {
+                    collisions.add(this.haveCollision(object, this));
+                }
             });
             let [x, y] = this.getExplosionPosition();
             if (collisions.size > 1) {
                 this.explosion = new Explosion(x, y, this.tank);
-                map.update(...collisions);
+                world.updateObjects(collisions);
             }
         } else {
             this.explosion.update()

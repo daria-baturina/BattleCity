@@ -1,4 +1,4 @@
-import {BASE_BLOCK_SIZE, UNIT_SIZE} from "./data.js";
+import {BASE_BLOCK_SIZE, BULLET_SIZE, UNIT_SIZE} from "./data.js";
 import Bullet from "./bullet.js";
 
 export default class Tank {
@@ -15,11 +15,25 @@ export default class Tank {
         this.speed = 1;
     }
 
-    haveCollision(a, aSize, b, bSize) {
-        return (a.x + aSize > b.x &&
-            b.x + bSize > a.x &&
-            a.y + aSize > b.y &&
-            b.y + bSize > a.y)
+    haveCollision(a, b) {
+        let getSize = obj => {
+            switch (obj.type) {
+                case -1:
+                case 1:
+                case 2:
+                    return BASE_BLOCK_SIZE;
+                case "playerTank":
+                case "enemyTank":
+                case "base":
+                    return UNIT_SIZE;
+                case "bullet":
+                    return BULLET_SIZE;
+            }
+        }
+        return (a.x + getSize(a) > b.x &&
+            b.x + getSize(b) > a.x &&
+            a.y + getSize(a) > b.y &&
+            b.y + getSize(b) > a.y)
     }
 
     getBulletStartingPosition(direction) {
@@ -47,11 +61,13 @@ export default class Tank {
         }
     }
 
-    checkCollisions(map, previousX, previousY) {
+    checkCollisions(objects, previousX, previousY) {
         /*есть ли коллизии после передвижения*/
         let collision = new Set();
-        map.map.forEach((object) => {
-            collision.add(this.haveCollision(object, BASE_BLOCK_SIZE, this, UNIT_SIZE));
+        objects.forEach((object) => {
+            if (object !== this) {
+                collision.add(this.haveCollision(object, this));
+            }
         });
 
         /*если есть коллизии оставить предыдущие значения x и y*/
@@ -61,7 +77,7 @@ export default class Tank {
         }
 
         /*сдвинулся ли танк*/
-        this.moved = previousX === this.x && previousY === this.y;
+        this.moved = !(previousX === this.x && previousY === this.y);
 
         /*счетчик движения в одном направлении*/
         this.previousDirection === this.direction.direction ?

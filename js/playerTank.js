@@ -23,13 +23,13 @@ export default class PlayerTank extends Tank {
     }
 
 
-    update(activeKeys, map, gameSpeed) {
+    update(activeKeys, world, gameSpeed) {
         let shift = gameSpeed * this.speed;
         this.previousDirection = this.direction.direction;
         let previousX = this.x;
         let previousY = this.y;
         if (this.bullet) {
-            this.bullet.update(map, gameSpeed);
+            this.bullet.update(world, gameSpeed);
         }
         if (activeKeys.has("Space")) {
             this.fire(this.direction.direction);
@@ -38,7 +38,7 @@ export default class PlayerTank extends Tank {
             this.direction.direction = this.getDirectionForKeys(activeKeys);
             this.turn(shift);
         }
-        this.checkCollisions(map, previousX, previousY);
+        this.checkCollisions(world.objects, previousX, previousY);
     }
 }
 
